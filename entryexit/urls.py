@@ -31,4 +31,5 @@ urlpatterns = [
     path('shifts/', views.shifts, name='shifts'),
     path('statistics', views.statistics, name='statistics'),
     path('statistics/', views.statistics, name='statistics'),
+    path('get_reader_data', views.get_reader_data),
 ]

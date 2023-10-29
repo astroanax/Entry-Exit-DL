@@ -7,10 +7,12 @@ from datetime import datetime
 from django.shortcuts import redirect
 from datetime import date, timedelta, datetime
 from django.http import HttpResponse
-from .functions import isnine,isfour,read_data_with_retry
+from .functions import isnine,isfour,read_data_with_retry, readData
 from django.db.models import Count, Q
 from django.db.models.functions import ExtractWeekDay
 from django.db.models import F
+import threading
+import time
 
 
 
@@ -411,3 +413,26 @@ def statistics(request):
     'saturday':saturday_entries/saturday,
     'sunday':sunday_entries/sunday,
         })
+
+def reader_daemon():
+    global student_id
+    while True:
+        start_time = time.time()
+        try:
+            data = readData()
+            if data:
+                student_id = data[1:]
+        except:
+            pass
+        if time.time() - start_time < 0.5:
+            # so that the reader doesn't get 'stressed' out
+            try:
+                time.sleep(0.5 - (time.time()-start_time))
+            except ValueError:
+                pass
+student_id = None
+reader_daemon_thread = threading.Thread(target=reader_daemon)
+reader_daemon_thread.setDaemon(True)
+reader_daemon_thread.start()
+def get_reader_data(request):
+    return HttpResponse(str(student_id))

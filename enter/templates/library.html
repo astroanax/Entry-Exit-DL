@@ -75,6 +75,15 @@
           // Change the CSS style to hide the div
           msg.style.display = "none";
         }, 5000);
+	let worker = new Worker("{% static 'readData.js' %}");
+	worker.onmessage = function(event) {
+		let student_id = event.data;
+		let form = document.getElementsByTagName('form')[0]
+		let input = document.getElementById('student_id');
+		input.value = student_id;
+		console.log(student_id)
+		form.submit();
+	};
     </script>
     
 {% endblock %}
